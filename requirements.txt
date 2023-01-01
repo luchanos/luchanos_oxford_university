@@ -1,0 +1,8 @@
+fastapi==0.88.0
+uvicorn==0.20.0
+SQLAlchemy==1.4.45
+pydantic[email]
+envparse==0.2.0
+psycopg2==2.9.5
+asyncpg==0.27.0
+alembic==1.9.0
