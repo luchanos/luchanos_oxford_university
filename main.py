@@ -13,9 +13,6 @@ from pydantic import BaseModel
 from pydantic import EmailStr
 from pydantic import validator
 
-# create instance of the app
-app = FastAPI(title="luchanos-oxford-university")
-
 
 ##############################################
 # BLOCK FOR COMMON INTERACTION WITH DATABASE #
@@ -117,6 +114,9 @@ class ShowUser(TunedModel):
 #########################
 # BLOCK WITH API ROUTES #
 #########################
+
+# create instance of the app
+app = FastAPI(title="luchanos-oxford-university")
 
 user_router = APIRouter()
 
