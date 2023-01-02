@@ -81,6 +81,14 @@ class TunedModel(BaseModel):
         orm_mode = True
 
 
+class ShowUser(TunedModel):
+    user_id: uuid.UUID
+    name: str
+    surname: str
+    email: EmailStr
+    is_active: bool
+
+
 class UserCreate(BaseModel):
     name: str
     surname: str
@@ -101,14 +109,6 @@ class UserCreate(BaseModel):
                 status_code=422, detail="Surname should contains only letters"
             )
         return value
-
-
-class ShowUser(TunedModel):
-    user_id: uuid.UUID
-    name: str
-    surname: str
-    email: EmailStr
-    is_active: bool
 
 
 #########################
