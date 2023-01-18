@@ -1,5 +1,4 @@
 from typing import Generator, Any
-from uuid import UUID
 
 import pytest
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession

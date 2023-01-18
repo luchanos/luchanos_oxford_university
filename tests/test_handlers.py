@@ -102,6 +102,13 @@ async def test_delete_user_not_found(client):
     assert resp.json() == {'detail': f'User with id {user_id} not found.'}
 
 
+async def test_get_user_user_id_validation_error(client):
+    resp = client.delete(f"/user/?user_id=123")
+    assert resp.status_code == 422
+    data_from_response = resp.json()
+    assert data_from_response == {'detail': [{'loc': ['query', 'user_id'], 'msg': 'value is not a valid uuid', 'type': 'type_error.uuid'}]}
+
+
 async def test_get_user(client, create_user_in_database, get_user_from_database):
     user_data = {
       "user_id": uuid4(),
@@ -135,6 +142,7 @@ async def test_get_user_validation_error(client, create_user_in_database, get_us
     data_from_response = resp.json()
     assert data_from_response == {'detail': [{'loc': ['query', 'user_id'], 'msg': 'value is not a valid uuid', 'type': 'type_error.uuid'}]}
 
+
 async def test_get_user_not_found(client, create_user_in_database, get_user_from_database):
     user_data = {
       "user_id": uuid4(),
@@ -148,7 +156,6 @@ async def test_get_user_not_found(client, create_user_in_database, get_user_from
     resp = client.get(f"/user/?user_id={user_id_for_finding}")
     assert resp.status_code == 404
     assert resp.json() == {'detail': f'User with id {user_id_for_finding} not found.'}
-
 
 
 async def test_update_user(client, create_user_in_database, get_user_from_database):
@@ -295,6 +302,19 @@ async def test_update_user_validation_error(client, create_user_in_database, get
     assert resp.status_code == expected_status_code
     resp_data = resp.json()
     assert resp_data == expected_detail
+
+
+async def test_update_user_id_validation_error(client):
+    user_data_updated = {
+      "name": "Ivan",
+      "surname": "Ivanov",
+      "email": "cheburek@kek.com",
+    }
+    resp = client.patch(f"/user/?user_id=123", data=json.dumps(user_data_updated))
+    assert resp.status_code == 422
+    data_from_response = resp.json()
+    assert data_from_response == {
+        'detail': [{'loc': ['query', 'user_id'], 'msg': 'value is not a valid uuid', 'type': 'type_error.uuid'}]}
 
 
 async def test_update_user_not_found_error(client):
