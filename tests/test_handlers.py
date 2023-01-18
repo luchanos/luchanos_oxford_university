@@ -121,6 +121,20 @@ async def test_get_user(client, create_user_in_database, get_user_from_database)
     assert user_from_response["is_active"] == user_data["is_active"]
 
 
+async def test_get_user_validation_error(client, create_user_in_database, get_user_from_database):
+    user_data = {
+      "user_id": uuid4(),
+      "name": "Nikolai",
+      "surname": "Sviridov",
+      "email": "lol@kek.com",
+      "is_active": True
+    }
+    await create_user_in_database(**user_data)
+    resp = client.get(f"/user/?user_id=123")
+    assert resp.status_code == 422
+    data_from_response = resp.json()
+    assert data_from_response == {'detail': [{'loc': ['query', 'user_id'], 'msg': 'value is not a valid uuid', 'type': 'type_error.uuid'}]}
+
 async def test_get_user_not_found(client, create_user_in_database, get_user_from_database):
     user_data = {
       "user_id": uuid4(),
