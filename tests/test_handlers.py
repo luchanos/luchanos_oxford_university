@@ -99,7 +99,7 @@ async def test_delete_user_not_found(client):
     user_id = uuid4()
     resp = client.delete(f"/user/?user_id={user_id}")
     assert resp.status_code == 404
-    assert resp.json() == {'detail': 'User with id 7e8e0aff-3930-4d64-910a-d1ab09c0e8d8 not found.'}
+    assert resp.json() == {'detail': f'User with id {user_id} not found.'}
 
 
 async def test_get_user(client, create_user_in_database, get_user_from_database):
