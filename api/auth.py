@@ -15,19 +15,18 @@ from db.session import get_db
 from hashing import Hasher
 
 
-async def _get_user_by_email_for_auth(email: str, db: AsyncSession):
-    async with db as session:
-        async with session.begin():
-            user_dal = UserDAL(session)
-            return await user_dal.get_user_by_email(
-                email=email,
-            )
+async def _get_user_by_email_for_auth(email: str, session: AsyncSession):
+    async with session.begin():
+        user_dal = UserDAL(session)
+        return await user_dal.get_user_by_email(
+            email=email,
+        )
 
 
 async def authenticate_user(
     email: str, password: str, db: AsyncSession
 ) -> Union[User, None]:
-    user = await _get_user_by_email_for_auth(email=email, db=db)
+    user = await _get_user_by_email_for_auth(email=email, session=db)
     if user is None:
         return
     if not Hasher.verify_password(password, user.hashed_password):
@@ -55,7 +54,7 @@ async def get_current_user_from_token(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = await _get_user_by_email_for_auth(email=email, db=db)
+    user = await _get_user_by_email_for_auth(email=email, session=db)
     if user is None:
         raise credentials_exception
     return user
