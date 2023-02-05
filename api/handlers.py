@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import Union
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -8,74 +7,22 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.auth import get_current_user_from_token
+from api.actions.auth import get_current_user_from_token
+from api.actions.user import _create_new_user
+from api.actions.user import _delete_user
+from api.actions.user import _get_user_by_id
+from api.actions.user import _update_user
 from api.models import DeleteUserResponse
 from api.models import ShowUser
 from api.models import UpdatedUserResponse
 from api.models import UpdateUserRequest
 from api.models import UserCreate
-from db.dals import UserDAL
 from db.models import User
 from db.session import get_db
-from hashing import Hasher
 
 logger = getLogger(__name__)
 
 user_router = APIRouter()
-
-
-async def _create_new_user(body: UserCreate, session) -> ShowUser:
-    async with session.begin():
-        user_dal = UserDAL(session)
-        user = await user_dal.create_user(
-            name=body.name,
-            surname=body.surname,
-            email=body.email,
-            hashed_password=Hasher.get_password_hash(body.password),
-        )
-        return ShowUser(
-            user_id=user.user_id,
-            name=user.name,
-            surname=user.surname,
-            email=user.email,
-            is_active=user.is_active,
-        )
-
-
-async def _delete_user(user_id, session) -> Union[UUID, None]:
-    async with session.begin():
-        user_dal = UserDAL(session)
-        deleted_user_id = await user_dal.delete_user(
-            user_id=user_id,
-        )
-        return deleted_user_id
-
-
-async def _update_user(
-    updated_user_params: dict, user_id: UUID, session
-) -> Union[UUID, None]:
-    async with session.begin():
-        user_dal = UserDAL(session)
-        updated_user_id = await user_dal.update_user(
-            user_id=user_id, **updated_user_params
-        )
-        return updated_user_id
-
-
-async def _get_user_by_id(user_id, session) -> Union[ShowUser, None]:
-    async with session.begin():
-        user_dal = UserDAL(session)
-        user = await user_dal.get_user_by_id(
-            user_id=user_id,
-        )
-        if user is not None:
-            return ShowUser(
-                user_id=user.user_id,
-                name=user.name,
-                surname=user.surname,
-                email=user.email,
-                is_active=user.is_active,
-            )
 
 
 @user_router.post("/", response_model=ShowUser)
