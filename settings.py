@@ -13,7 +13,6 @@ ALGORITHM: str = env.str("ALGORITHM", default="HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES: int = env.int("ACCESS_TOKEN_EXPIRE_MINUTES", default=30)
 
 # test envs
-TEST_USER_EMAIL = "test@example.com"
 TEST_DATABASE_URL = env.str(
     "TEST_DATABASE_URL",
     default="postgresql+asyncpg://postgres_test:postgres_test@0.0.0.0:5433/postgres_test",
