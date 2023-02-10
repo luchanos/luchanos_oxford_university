@@ -38,21 +38,21 @@ class UserDAL:
         )
         res = await self.db_session.execute(query)
         deleted_user_id_row = res.fetchone()
-        if deleted_user_id_row is not None:
+        if deleted_user_id_row:
             return deleted_user_id_row[0]
 
     async def get_user_by_id(self, user_id: UUID) -> Union[User, None]:
         query = select(User).where(User.user_id == user_id)
         res = await self.db_session.execute(query)
         user_row = res.fetchone()
-        if user_row is not None:
+        if user_row:
             return user_row[0]
 
     async def get_user_by_email(self, email: str) -> Union[User, None]:
         query = select(User).where(User.email == email)
         res = await self.db_session.execute(query)
         user_row = res.fetchone()
-        if user_row is not None:
+        if user_row:
             return user_row[0]
 
     async def update_user(self, user_id: UUID, **kwargs) -> Union[UUID, None]:
@@ -64,5 +64,5 @@ class UserDAL:
         )
         res = await self.db_session.execute(query)
         update_user_id_row = res.fetchone()
-        if update_user_id_row is not None:
+        if update_user_id_row:
             return update_user_id_row[0]
