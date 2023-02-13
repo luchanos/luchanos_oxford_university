@@ -1,4 +1,3 @@
-import re
 import uuid
 from typing import Optional
 
@@ -11,8 +10,6 @@ from pydantic import validator
 #########################
 # BLOCK WITH API MODELS #
 #########################
-
-LETTER_MATCH_PATTERN = re.compile(r"^[а-яА-Яa-zA-Z\-]+$")
 
 
 class TunedModel(BaseModel):
@@ -38,7 +35,7 @@ class UserCreate(BaseModel):
 
     @validator("name")
     def validate_name(cls, value):
-        if not LETTER_MATCH_PATTERN.match(value):
+        if not value.isalnum():
             raise HTTPException(
                 status_code=422, detail="Name should contains only letters"
             )
@@ -46,7 +43,7 @@ class UserCreate(BaseModel):
 
     @validator("surname")
     def validate_surname(cls, value):
-        if not LETTER_MATCH_PATTERN.match(value):
+        if not value.isalnum():
             raise HTTPException(
                 status_code=422, detail="Surname should contains only letters"
             )
@@ -68,7 +65,7 @@ class UpdateUserRequest(BaseModel):
 
     @validator("name")
     def validate_name(cls, value):
-        if not LETTER_MATCH_PATTERN.match(value):
+        if not value.isalnum():
             raise HTTPException(
                 status_code=422, detail="Name should contains only letters"
             )
@@ -76,7 +73,7 @@ class UpdateUserRequest(BaseModel):
 
     @validator("surname")
     def validate_surname(cls, value):
-        if not LETTER_MATCH_PATTERN.match(value):
+        if not value.isalnum():
             raise HTTPException(
                 status_code=422, detail="Surname should contains only letters"
             )
