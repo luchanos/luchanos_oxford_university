@@ -35,18 +35,36 @@ async def create_user(body: UserCreate, db: AsyncSession = Depends(get_db)) -> S
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
 
 
+def check_admin_permissions(
+    current_user_roles: list[PortalRole], touched_user_roles: list[PortalRole]
+):
+    return not {
+        PortalRole.ROLE_PORTAL_ADMIN,
+        PortalRole.ROLE_PORTAL_SUPERADMIN,
+    }.intersection(current_user_roles) or (
+        PortalRole.ROLE_PORTAL_SUPERADMIN in touched_user_roles
+        and PortalRole.ROLE_PORTAL_ADMIN in current_user_roles
+    )
+
+
 @user_router.delete("/", response_model=DeleteUserResponse)
 async def delete_user(
     user_id: UUID,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_from_token),
 ) -> DeleteUserResponse:
-    deleted_user_id = await _delete_user(user_id, db)
+    user_for_deletion = await _get_user_by_id(user_id, db)
+    if user_for_deletion is None:
+        raise HTTPException(
+            status_code=404, detail=f"User with id {user_id} not found."
+        )
     if user_id != current_user.user_id:
-        if PortalRole.ROLE_PORTAL_USER not in current_user.roles and PortalRole.ROLE_PORTAL_SUPERADMIN not in current_user.roles:
-            raise HTTPException(
-                status_code=403, detail=f"Forbidden."
-            )
+        if check_admin_permissions(
+            current_user_roles=current_user.roles,
+            touched_user_roles=user_for_deletion.roles,
+        ):
+            raise HTTPException(status_code=403, detail="Forbidden.")
+    deleted_user_id = await _delete_user(user_id, db)
     if deleted_user_id is None:
         raise HTTPException(
             status_code=404, detail=f"User with id {user_id} not found."
