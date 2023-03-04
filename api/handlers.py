@@ -35,16 +35,21 @@ async def create_user(body: UserCreate, db: AsyncSession = Depends(get_db)) -> S
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
 
 
-def check_admin_permissions(
-    current_user_roles: list[PortalRole], touched_user_roles: list[PortalRole]
-):
-    return not {
-        PortalRole.ROLE_PORTAL_ADMIN,
-        PortalRole.ROLE_PORTAL_SUPERADMIN,
-    }.intersection(current_user_roles) or (
-        PortalRole.ROLE_PORTAL_SUPERADMIN in touched_user_roles
-        and PortalRole.ROLE_PORTAL_ADMIN in current_user_roles
-    )
+def check_user_permissions(target_user, current_user):
+    if target_user.user_id != current_user.user_id:
+        # check admin role
+        if not {
+            PortalRole.ROLE_PORTAL_ADMIN,
+            PortalRole.ROLE_PORTAL_SUPERADMIN,
+        }.intersection(current_user.roles):
+            return False
+        # check admin deactivate superadmin attempt
+        if (
+            PortalRole.ROLE_PORTAL_SUPERADMIN in target_user.roles
+            and PortalRole.ROLE_PORTAL_ADMIN in current_user.roles
+        ):
+            return False
+    return True
 
 
 @user_router.delete("/", response_model=DeleteUserResponse)
@@ -58,12 +63,11 @@ async def delete_user(
         raise HTTPException(
             status_code=404, detail=f"User with id {user_id} not found."
         )
-    if user_id != current_user.user_id:
-        if check_admin_permissions(
-            current_user_roles=current_user.roles,
-            touched_user_roles=user_for_deletion.roles,
-        ):
-            raise HTTPException(status_code=403, detail="Forbidden.")
+    if not check_user_permissions(
+        target_user=user_for_deletion,
+        current_user=current_user,
+    ):
+        raise HTTPException(status_code=403, detail="Forbidden.")
     deleted_user_id = await _delete_user(user_id, db)
     if deleted_user_id is None:
         raise HTTPException(
@@ -99,11 +103,16 @@ async def update_user_by_id(
             status_code=422,
             detail="At least one parameter for user update info should be provided",
         )
-    user = await _get_user_by_id(user_id, db)
-    if user is None:
+    user_for_update = await _get_user_by_id(user_id, db)
+    if user_for_update is None:
         raise HTTPException(
             status_code=404, detail=f"User with id {user_id} not found."
         )
+    if user_id != current_user.user_id:
+        if check_user_permissions(
+            target_user=user_for_update, current_user=current_user
+        ):
+            raise HTTPException(status_code=403, detail="Forbidden.")
     try:
         updated_user_id = await _update_user(
             updated_user_params=updated_user_params, session=db, user_id=user_id
