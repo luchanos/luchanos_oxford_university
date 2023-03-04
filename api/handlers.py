@@ -17,6 +17,7 @@ from api.models import ShowUser
 from api.models import UpdatedUserResponse
 from api.models import UpdateUserRequest
 from api.models import UserCreate
+from db.dals import PortalRole
 from db.models import User
 from db.session import get_db
 
@@ -41,6 +42,11 @@ async def delete_user(
     current_user: User = Depends(get_current_user_from_token),
 ) -> DeleteUserResponse:
     deleted_user_id = await _delete_user(user_id, db)
+    if user_id != current_user.user_id:
+        if PortalRole.ROLE_PORTAL_USER not in current_user.roles and PortalRole.ROLE_PORTAL_SUPERADMIN not in current_user.roles:
+            raise HTTPException(
+                status_code=403, detail=f"Forbidden."
+            )
     if deleted_user_id is None:
         raise HTTPException(
             status_code=404, detail=f"User with id {user_id} not found."

@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Union
 from uuid import UUID
 
@@ -13,6 +14,12 @@ from db.models import User
 ###########################################################
 
 
+class PortalRole(str, Enum):
+    ROLE_PORTAL_USER = "ROLE_PORTAL_USER"
+    ROLE_PORTAL_ADMIN = "ROLE_PORTAL_ADMIN"
+    ROLE_PORTAL_SUPERADMIN = "ROLE_PORTAL_SUPERADMIN"
+
+
 class UserDAL:
     """Data Access Layer for operating user info"""
 
@@ -23,7 +30,8 @@ class UserDAL:
         self, name: str, surname: str, email: str, hashed_password: str
     ) -> User:
         new_user = User(
-            name=name, surname=surname, email=email, hashed_password=hashed_password
+            name=name, surname=surname, email=email, hashed_password=hashed_password,
+            roles=[PortalRole.ROLE_PORTAL_USER, ]
         )
         self.db_session.add(new_user)
         await self.db_session.flush()
