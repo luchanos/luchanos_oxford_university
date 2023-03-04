@@ -11,6 +11,7 @@ async def test_delete_user(client, create_user_in_database, get_user_from_databa
         "email": "lol@kek.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
     resp = client.delete(
@@ -36,6 +37,7 @@ async def test_delete_user_not_found(client, create_user_in_database):
         "email": "lol@kek.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
     user_id = uuid4()
@@ -55,6 +57,7 @@ async def test_delete_user_user_id_validation_error(client, create_user_in_datab
         "email": "lol@kek.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
     resp = client.delete(
@@ -82,6 +85,7 @@ async def test_delete_user_bad_cred(client, create_user_in_database):
         "email": "lol@kek.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
     user_id = uuid4()
@@ -101,6 +105,7 @@ async def test_delete_user_unauth(client, create_user_in_database):
         "email": "lol@kek.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
     user_id = uuid4()
@@ -122,6 +127,7 @@ async def test_delete_user_no_jwt(client, create_user_in_database):
         "email": "lol@kek.com",
         "is_active": True,
         "hashed_password": "SampleHashedPass",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
     user_id = uuid4()
