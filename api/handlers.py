@@ -12,12 +12,12 @@ from api.actions.user import _create_new_user
 from api.actions.user import _delete_user
 from api.actions.user import _get_user_by_id
 from api.actions.user import _update_user
+from api.actions.user import check_user_permissions
 from api.models import DeleteUserResponse
 from api.models import ShowUser
 from api.models import UpdatedUserResponse
 from api.models import UpdateUserRequest
 from api.models import UserCreate
-from db.dals import PortalRole
 from db.models import User
 from db.session import get_db
 
@@ -33,23 +33,6 @@ async def create_user(body: UserCreate, db: AsyncSession = Depends(get_db)) -> S
     except IntegrityError as err:
         logger.error(err)
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
-
-
-def check_user_permissions(target_user, current_user):
-    if target_user.user_id != current_user.user_id:
-        # check admin role
-        if not {
-            PortalRole.ROLE_PORTAL_ADMIN,
-            PortalRole.ROLE_PORTAL_SUPERADMIN,
-        }.intersection(current_user.roles):
-            return False
-        # check admin deactivate superadmin attempt
-        if (
-            PortalRole.ROLE_PORTAL_SUPERADMIN in target_user.roles
-            and PortalRole.ROLE_PORTAL_ADMIN in current_user.roles
-        ):
-            return False
-    return True
 
 
 @user_router.delete("/", response_model=DeleteUserResponse)
