@@ -48,7 +48,6 @@ async def get_current_user_from_token(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         email: str = payload.get("sub")
-        print("username/email extracted is ", email)
         if email is None:
             raise credentials_exception
     except JWTError:
