@@ -12,6 +12,7 @@ from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
 import settings
+from db.dals import PortalRole
 from db.session import get_db
 from main import app
 from security import create_access_token
@@ -108,7 +109,7 @@ async def create_user_in_database(asyncpg_pool):
         email: str,
         is_active: bool,
         hashed_password: str,
-        roles: list[str],
+        roles: list[PortalRole],
     ):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute(

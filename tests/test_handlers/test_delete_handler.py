@@ -240,6 +240,26 @@ async def test_delete_user_by_privilege_roles(
                 "roles": ["ROLE_PORTAL_USER", "ROLE_PORTAL_ADMIN"],
             },
         ),
+        (
+            {
+                "user_id": uuid4(),
+                "name": "Nikolai",
+                "surname": "Sviridov",
+                "email": "lol@kek.com",
+                "is_active": True,
+                "hashed_password": "SampleHashedPass",
+                "roles": ["ROLE_PORTAL_USER", "ROLE_PORTAL_ADMIN"],
+            },
+            {
+                "user_id": uuid4(),
+                "name": "Admin",
+                "surname": "Adminov",
+                "email": "admin@kek.com",
+                "is_active": True,
+                "hashed_password": "SampleHashedPass",
+                "roles": ["ROLE_PORTAL_USER", "ROLE_PORTAL_ADMIN"],
+            },
+        ),
     ],
 )
 async def test_delete_another_user_error(

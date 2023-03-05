@@ -17,6 +17,9 @@ async def _create_new_user(body: UserCreate, session) -> ShowUser:
             surname=body.surname,
             email=body.email,
             hashed_password=Hasher.get_password_hash(body.password),
+            roles=[
+                PortalRole.ROLE_PORTAL_USER,
+            ],
         )
         return ShowUser(
             user_id=user.user_id,
@@ -68,6 +71,12 @@ def check_user_permissions(target_user: User, current_user: User) -> bool:
         # check admin deactivate superadmin attempt
         if (
             PortalRole.ROLE_PORTAL_SUPERADMIN in target_user.roles
+            and PortalRole.ROLE_PORTAL_ADMIN in current_user.roles
+        ):
+            return False
+        # check admin deactivate admin attempt
+        if (
+            PortalRole.ROLE_PORTAL_ADMIN in target_user.roles
             and PortalRole.ROLE_PORTAL_ADMIN in current_user.roles
         ):
             return False
