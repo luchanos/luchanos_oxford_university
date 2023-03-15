@@ -5,8 +5,8 @@ from fastapi import HTTPException
 
 from api.models import ShowUser
 from api.models import UserCreate
-from db.dals import PortalRole
 from db.dals import UserDAL
+from db.models import PortalRole
 from db.models import User
 from hashing import Hasher
 
