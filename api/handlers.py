@@ -84,7 +84,7 @@ async def grant_admin_privilege(
             status_code=404, detail=f"User with id {user_id} not found."
         )
     updated_user_params = {
-        "roles": [*user_for_promotion.roles, PortalRole.ROLE_PORTAL_ADMIN]
+        "roles": {*user_for_promotion.roles, PortalRole.ROLE_PORTAL_ADMIN}
     }
     try:
         promoted_user_id = await _update_user(
@@ -118,7 +118,7 @@ async def revoke_admin_privilege(
             status_code=400, detail="Cannot manage privileges of itself."
         )
     user_for_revoke_admin_privileges.remove_admin_privileges_from_model()
-    updated_user_params = {"roles": user_for_revoke_admin_privileges.roles}
+    updated_user_params = {"roles": {*user_for_revoke_admin_privileges.roles}}
     try:
         promoted_user_id = await _update_user(
             updated_user_params=updated_user_params, session=db, user_id=user_id
