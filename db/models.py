@@ -39,3 +39,13 @@ class User(Base):
     @property
     def is_admin(self):
         return PortalRole.ROLE_PORTAL_ADMIN in self.roles
+
+    def add_admin_privileges_to_model(self):
+        if not self.is_admin:
+            self.roles += [PortalRole.ROLE_PORTAL_ADMIN]
+
+    def remove_admin_privileges_from_model(self):
+        if self.is_admin:
+            self.roles = [
+                role for role in self.roles if role != PortalRole.ROLE_PORTAL_ADMIN
+            ]
