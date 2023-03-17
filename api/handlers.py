@@ -67,22 +67,22 @@ async def grant_admin_privilege(
 ):
     if not current_user.is_superadmin:
         raise HTTPException(status_code=403, detail="Forbidden.")
+    if current_user.user_id == user_id:
+        raise HTTPException(
+            status_code=400, detail="Cannot manage privileges of itself."
+        )
     user_for_promotion = await _get_user_by_id(user_id, db)
     if user_for_promotion.is_admin or user_for_promotion.is_superadmin:
         raise HTTPException(
             status_code=409,
             detail=f"User with id {user_id} already promoted to admin / superadmin.",
         )
-    if current_user.user_id == user_id:
-        raise HTTPException(
-            status_code=400, detail="Cannot manage privileges of itself."
-        )
     if user_for_promotion is None:
         raise HTTPException(
             status_code=404, detail=f"User with id {user_id} not found."
         )
     updated_user_params = {
-        "roles": {*user_for_promotion.add_admin_privileges_to_model()}
+        "roles": user_for_promotion.enrich_admin_roles_by_admin_role()
     }
     try:
         updated_user_id = await _update_user(
