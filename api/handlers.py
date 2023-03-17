@@ -14,7 +14,6 @@ from api.actions.user import _get_user_by_id
 from api.actions.user import _update_user
 from api.actions.user import check_user_permissions
 from api.models import DeleteUserResponse
-from api.models import PromotedUserResponse
 from api.models import ShowUser
 from api.models import UpdatedUserResponse
 from api.models import UpdateUserRequest
@@ -61,7 +60,7 @@ async def delete_user(
     return DeleteUserResponse(deleted_user_id=deleted_user_id)
 
 
-@user_router.patch("/admin_privilege", response_model=PromotedUserResponse)
+@user_router.patch("/admin_privilege", response_model=UpdatedUserResponse)
 async def grant_admin_privilege(
     user_id: UUID,
     db: AsyncSession = Depends(get_db),
@@ -87,16 +86,16 @@ async def grant_admin_privilege(
         "roles": {*user_for_promotion.roles, PortalRole.ROLE_PORTAL_ADMIN}
     }
     try:
-        promoted_user_id = await _update_user(
+        updated_user_id = await _update_user(
             updated_user_params=updated_user_params, session=db, user_id=user_id
         )
     except IntegrityError as err:
         logger.error(err)
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
-    return PromotedUserResponse(promoted_user_id=promoted_user_id)
+    return UpdatedUserResponse(updated_user_id=updated_user_id)
 
 
-@user_router.delete("/admin_privilege", response_model=PromotedUserResponse)
+@user_router.delete("/admin_privilege", response_model=UpdatedUserResponse)
 async def revoke_admin_privilege(
     user_id: UUID,
     db: AsyncSession = Depends(get_db),
@@ -123,13 +122,13 @@ async def revoke_admin_privilege(
         }
     }
     try:
-        promoted_user_id = await _update_user(
+        updated_user_id = await _update_user(
             updated_user_params=updated_user_params, session=db, user_id=user_id
         )
     except IntegrityError as err:
         logger.error(err)
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
-    return PromotedUserResponse(promoted_user_id=promoted_user_id)
+    return UpdatedUserResponse(updated_user_id=updated_user_id)
 
 
 @user_router.get("/", response_model=ShowUser)

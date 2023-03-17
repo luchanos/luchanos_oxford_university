@@ -57,10 +57,6 @@ class DeleteUserResponse(BaseModel):
     deleted_user_id: uuid.UUID
 
 
-class PromotedUserResponse(BaseModel):
-    promoted_user_id: uuid.UUID
-
-
 class UpdatedUserResponse(BaseModel):
     updated_user_id: uuid.UUID
 
