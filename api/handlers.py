@@ -13,11 +13,11 @@ from api.actions.user import _delete_user
 from api.actions.user import _get_user_by_id
 from api.actions.user import _update_user
 from api.actions.user import check_user_permissions
-from api.models import DeleteUserResponse
-from api.models import ShowUser
-from api.models import UpdatedUserResponse
-from api.models import UpdateUserRequest
-from api.models import UserCreate
+from api.schemas import DeleteUserResponse
+from api.schemas import ShowUser
+from api.schemas import UpdatedUserResponse
+from api.schemas import UpdateUserRequest
+from api.schemas import UserCreate
 from db.models import User
 from db.session import get_db
 
