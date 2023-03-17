@@ -302,3 +302,5 @@ async def test_reject_delete_superadmin(
     )
     assert resp.status_code == 406
     assert resp.json() == {"detail": "Superadmin cannot be deleted via API."}
+    user_from_database = await get_user_from_database(user_for_deletion["user_id"])
+    assert PortalRole.ROLE_PORTAL_SUPERADMIN in dict(user_from_database[0])["roles"]
