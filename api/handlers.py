@@ -105,7 +105,7 @@ async def revoke_admin_privilege(
     user_for_revoke_admin_privileges = await _get_user_by_id(user_id, db)
     if not current_user.is_superadmin:
         raise HTTPException(status_code=403, detail="Forbidden.")
-    if not current_user.is_admin:
+    if not user_for_revoke_admin_privileges.is_admin:
         raise HTTPException(
             status_code=409, detail=f"User with id {user_id} has no admin privileges."
         )
@@ -113,12 +113,15 @@ async def revoke_admin_privilege(
         raise HTTPException(
             status_code=404, detail=f"User with id {user_id} not found."
         )
-    if user_for_revoke_admin_privileges.user_id == user_id:
+    if current_user.user_id == user_id:
         raise HTTPException(
             status_code=400, detail="Cannot manage privileges of itself."
         )
-    user_for_revoke_admin_privileges.remove_admin_privileges_from_model()
-    updated_user_params = {"roles": {*user_for_revoke_admin_privileges.roles}}
+    updated_user_params = {
+        "roles": {
+            *user_for_revoke_admin_privileges.remove_admin_privileges_from_model()
+        }
+    }
     try:
         promoted_user_id = await _update_user(
             updated_user_params=updated_user_params, session=db, user_id=user_id
