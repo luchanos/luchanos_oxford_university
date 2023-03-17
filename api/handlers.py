@@ -66,9 +66,9 @@ async def grant_admin_privilege(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_from_token),
 ):
-    user_for_promotion = await _get_user_by_id(user_id, db)
     if not current_user.is_superadmin:
         raise HTTPException(status_code=403, detail="Forbidden.")
+    user_for_promotion = await _get_user_by_id(user_id, db)
     if user_for_promotion.is_admin or user_for_promotion.is_superadmin:
         raise HTTPException(
             status_code=409,
