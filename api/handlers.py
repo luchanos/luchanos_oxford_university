@@ -18,7 +18,6 @@ from api.models import ShowUser
 from api.models import UpdatedUserResponse
 from api.models import UpdateUserRequest
 from api.models import UserCreate
-from db.models import PortalRole
 from db.models import User
 from db.session import get_db
 
@@ -83,7 +82,7 @@ async def grant_admin_privilege(
             status_code=404, detail=f"User with id {user_id} not found."
         )
     updated_user_params = {
-        "roles": {*user_for_promotion.roles, PortalRole.ROLE_PORTAL_ADMIN}
+        "roles": {*user_for_promotion.add_admin_privileges_to_model()}
     }
     try:
         updated_user_id = await _update_user(

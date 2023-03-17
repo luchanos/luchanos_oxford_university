@@ -41,9 +41,8 @@ class User(Base):
         return PortalRole.ROLE_PORTAL_ADMIN in self.roles
 
     def add_admin_privileges_to_model(self):
-        # todo luchanos не работает
         if not self.is_admin:
-            self.roles += [PortalRole.ROLE_PORTAL_ADMIN]
+            return self.roles + [PortalRole.ROLE_PORTAL_ADMIN]
 
     def remove_admin_privileges_from_model(self):
         if self.is_admin:
