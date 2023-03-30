@@ -11,7 +11,7 @@ from api.login_handler import login_router
 #########################
 
 # create instance of the app
-app = FastAPI(title="luchanos-oxford-university", root_path="/app1")
+app = FastAPI(title="luchanos-oxford-university")
 
 # create the instance for the routes
 main_api_router = APIRouter()
