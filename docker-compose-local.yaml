@@ -25,6 +25,8 @@ services:
     networks:
       - custom
   prometheus:
+    depends:
+      - luchanos_oxford_university_app
     image: prom/prometheus:latest
     container_name: prometheus
     restart: unless-stopped
