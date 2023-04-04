@@ -23,6 +23,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    networks:
+      - custom
   prometheus:
     depends_on:
       - luchanos_oxford_university_app
