@@ -17,11 +17,22 @@ services:
     image: luchanos_oxford_university_app # Specify the name of the Docker image to be built
     environment:
       REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+      SENTRY_URL: "https://2d340f23a0454ea0a23a0d2d6fbe2e1f@o4504938483875840.ingest.sentry.io/4504939751538688"
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
     networks:
       - custom
 networks:

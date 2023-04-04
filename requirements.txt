@@ -16,3 +16,4 @@ python-multipart==0.0.5
 bcrypt==4.0.1
 greenlet==2.0.2
 sentry-sdk[fastapi]
+starlette-exporter==0.15.1
