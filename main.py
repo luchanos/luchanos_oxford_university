@@ -23,10 +23,11 @@ sentry_sdk.init(
 #########################
 # BLOCK WITH API ROUTES #
 #########################
+ignored_paths = ["/metrics"]
 
 # create instance of the app
 app = FastAPI(title="luchanos-oxford-university")
-app.add_middleware(PrometheusMiddleware)
+app.add_middleware(PrometheusMiddleware, ignored_paths=ignored_paths)
 app.add_route("/metrics", handle_metrics)
 
 # create the instance for the routes
