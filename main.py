@@ -9,7 +9,7 @@ import settings
 from api.handlers import user_router
 from api.login_handler import login_router
 from api.service import service_router
-
+from middlewares import CustomPrometheusMiddleware
 
 # sentry configuration
 sentry_sdk.init(
@@ -23,11 +23,11 @@ sentry_sdk.init(
 #########################
 # BLOCK WITH API ROUTES #
 #########################
-ignored_paths = ["/metrics"]
 
 # create instance of the app
 app = FastAPI(title="luchanos-oxford-university")
-app.add_middleware(PrometheusMiddleware, ignored_paths=ignored_paths)
+app.add_middleware(PrometheusMiddleware)
+app.add_middleware(CustomPrometheusMiddleware)
 app.add_route("/metrics", handle_metrics)
 
 # create the instance for the routes

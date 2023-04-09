@@ -18,6 +18,7 @@ services:
     environment:
       REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
       SENTRY_URL: "https://2d340f23a0454ea0a23a0d2d6fbe2e1f@o4504938483875840.ingest.sentry.io/4504939751538688"
+      APP_PORT: "8000"
     build:
       context: .
       dockerfile: Dockerfile
