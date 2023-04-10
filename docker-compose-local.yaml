@@ -36,6 +36,17 @@ services:
       - "9090:9090"
     networks:
       - custom
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana_storage:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: always
+    networks:
+      - custom
 networks:
   custom:
     driver: bridge
