@@ -47,6 +47,7 @@ services:
     restart: always
     networks:
       - custom
+    user: "0"
 networks:
   custom:
     driver: bridge
