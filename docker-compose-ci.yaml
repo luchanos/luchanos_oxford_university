@@ -15,6 +15,9 @@ services:
   luchanos_oxford_university_app:
     container_name: luchanos_oxford_university_app
     image: luchanos_oxford_university_app # Specify the name of the Docker image to be built
+    depends_on:
+      - db
+      - alembic_migrations
     environment:
       REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
       SENTRY_URL: "https://2d340f23a0454ea0a23a0d2d6fbe2e1f@o4504938483875840.ingest.sentry.io/4504939751538688"
@@ -30,8 +33,11 @@ services:
     container_name: alembic_migrations
     image: alembic_migrations # Specify the name of the Docker image to be built
     command: ./run.sh
+    depends_on:
+      - db
     environment:
-      ALEMBIC_DATABASE_URL: "postgresql://postgres:postgres@db:5432/postgres"
+      CI_MODE: "True"
+      ALEMBIC_DATABASE_URL: "postgresql://postgres:postgres@db/postgres"
       REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
       SENTRY_URL: "https://2d340f23a0454ea0a23a0d2d6fbe2e1f@o4504938483875840.ingest.sentry.io/4504939751538688"
       APP_PORT: "8001"
@@ -45,6 +51,7 @@ services:
   prometheus:
     depends_on:
       - luchanos_oxford_university_app
+      - db
     image: prom/prometheus:v2.43.0
     container_name: prometheus
     restart: unless-stopped
@@ -57,7 +64,7 @@ services:
     networks:
       - custom
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:8.5.22
     ports:
       - "3000:3000"
     volumes:
