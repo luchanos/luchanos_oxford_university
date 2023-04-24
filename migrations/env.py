@@ -2,10 +2,14 @@ import os  # todo luchanos should be explained
 from logging.config import fileConfig
 
 from alembic import context
+from envparse import Env
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from db.models import Base
+
+env = Env()
+CI_MODE = env.bool("CI_MODE", default=False)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -42,9 +46,12 @@ def run_migrations_offline() -> None:
     """
 
     # todo luchanos should be explained
-    url = os.environ.get(
-        "ALEMBIC_DATABASE_URL", config.get_main_option("sqlalchemy.url")
-    )
+    if CI_MODE is True:
+        url = os.environ.get(
+            "ALEMBIC_DATABASE_URL", config.get_main_option("sqlalchemy.url")
+        )
+    else:
+        url = config.get_main_option("sqlalchemy.url")
 
     context.configure(
         url=url,
