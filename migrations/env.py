@@ -1,15 +1,11 @@
-import os  # todo luchanos should be explained
+import os
 from logging.config import fileConfig
 
 from alembic import context
-from envparse import Env
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from db.models import Base
-
-env = Env()
-CI_MODE = env.bool("CI_MODE", default=False)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -31,6 +27,14 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+# todo luchanos should be explained
+# we don't want to get database url from alembic.ini - now we take it from env variables
+url = os.environ.get("ALEMBIC_DATABASE_URL", config.get_main_option("sqlalchemy.url"))
+
+
+# FOR LOCAL MIGRATIONS ONLY
+# url = config.get_main_option("sqlalchemy.url")
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -44,14 +48,6 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-
-    # todo luchanos should be explained
-    if CI_MODE is True:
-        url = os.environ.get(
-            "ALEMBIC_DATABASE_URL", config.get_main_option("sqlalchemy.url")
-        )
-    else:
-        url = config.get_main_option("sqlalchemy.url")
 
     context.configure(
         url=url,
@@ -71,8 +67,11 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    config_section = config.get_section(config.config_ini_section)
+    config_section["sqlalchemy.url"] = url
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        config_section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

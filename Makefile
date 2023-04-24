@@ -1,4 +1,4 @@
-export DOCKER_DEFAULT_PLATFORM=linux/amd64  # resolve problem for mac m1 chip
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
 
 up:
 	docker compose -f docker-compose-local.yaml up -d
