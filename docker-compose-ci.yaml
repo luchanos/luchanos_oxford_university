@@ -12,6 +12,8 @@ services:
       - "5432:5432"
     networks:
       - custom
+    volumes:
+      - db-data:/var/lib/postgresql/data
   luchanos_oxford_university_app:
     container_name: luchanos_oxford_university_app
     image: luchanos_oxford_university_app # Specify the name of the Docker image to be built
@@ -56,18 +58,21 @@ services:
     restart: unless-stopped
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
       - "9090:9090"
     networks:
       - custom
+
   grafana:
     image: grafana/grafana:8.5.22
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana_storage:/var/lib/grafana
+      - grafana-data:/var/lib/grafana
+      - grafana-config:/etc/grafana
     depends_on:
       - prometheus
     restart: always
@@ -77,3 +82,8 @@ services:
 networks:
   custom:
     driver: bridge
+volumes:
+  db-data:
+  grafana-data:
+  grafana-config:
+  prometheus-data:
