@@ -14,7 +14,7 @@ RUN apt-get -y update && \
 COPY . .
 WORKDIR .
 
-# pip & poetry
+# pip & requirements
 RUN python3 -m pip install --user --upgrade pip && \
     python3 -m pip install -r requirements.txt
 
