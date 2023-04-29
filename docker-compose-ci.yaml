@@ -12,11 +12,18 @@ services:
       - "5432:5432"
     networks:
       - custom
+    volumes:
+      - db-data:/var/lib/postgresql/data
   luchanos_oxford_university_app:
     container_name: luchanos_oxford_university_app
     image: luchanos_oxford_university_app # Specify the name of the Docker image to be built
+    depends_on:
+      - db
+      - alembic_migrations
     environment:
       REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+      SENTRY_URL: "https://2d340f23a0454ea0a23a0d2d6fbe2e1f@o4504938483875840.ingest.sentry.io/4504939751538688"
+      APP_PORT: "8000"
     build:
       context: .
       dockerfile: Dockerfile
@@ -24,6 +31,58 @@ services:
       - "8000:8000"
     networks:
       - custom
+  alembic_migrations:
+    container_name: alembic_migrations
+    image: alembic_migrations # Specify the name of the Docker image to be built
+    command: ./run.sh
+    depends_on:
+      - db
+    environment:
+      ALEMBIC_DATABASE_URL: "postgresql://postgres:postgres@db/postgres"
+      REAL_DATABASE_URL: "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+      SENTRY_URL: "https://2d340f23a0454ea0a23a0d2d6fbe2e1f@o4504938483875840.ingest.sentry.io/4504939751538688"
+      APP_PORT: "8001"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    networks:
+      - custom
+  prometheus:
+    depends_on:
+      - luchanos_oxford_university_app
+    image: prom/prometheus:v2.43.0
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    networks:
+      - custom
+
+  grafana:
+    image: grafana/grafana:8.5.22
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - grafana-config:/etc/grafana
+    depends_on:
+      - prometheus
+    restart: always
+    networks:
+      - custom
+    user: "0"
 networks:
   custom:
     driver: bridge
+volumes:
+  db-data:
+  grafana-data:
+  grafana-config:
+  prometheus-data:
